@@ -2,28 +2,32 @@
 import sqlite3
 import os
 
-# Connect to the database
-conn = sqlite3.connect("hit_counter.sqlite3")
-dbh = conn.cursor()
+def connect_to_db():
+    dbh = sqlite3.connect("hit_counter.sqlite3")
+    dbh.execute("CREATE TABLE IF NOT EXISTS counters(hits INTEGER, ip TEXT PRIMARY KEY)")
+    return dbh
 
-# Make sure our table exists
-dbh.execute("""
-    CREATE TABLE IF NOT EXISTS
-    counters(hits INTEGER, ip TEXT PRIMARY KEY)
-    """)
+def generate_summary_of_visits(dbh):
+    result = dbh.execute("SELECT SUM(hits), COUNT(*) from counters")
+    (views, visitors) = result.fetchone()
+    return f"This page has been viewed {views} times by {visitors} unique visitors"
 
-# Increment a counter based on the client's IP
-ip = os.environ['REMOTE_ADDR']
-dbh.execute("""
-    INSERT INTO counters(hits,ip) VALUES(1,?)
-    ON CONFLICT(ip) DO
-    UPDATE SET hits = (counters.hits + 1) WHERE ip=?
-    """, (ip, ip))
-conn.commit()
+def record_new_visit(dbh, ip):
+    with dbh:
+        dbh.execute("""
+            INSERT INTO counters(hits,ip) VALUES(1,?)
+            ON CONFLICT(ip) DO
+            UPDATE SET hits = (counters.hits + 1) WHERE ip=?
+            """, (ip, ip))
 
-# Print the total number of visitors
-dbh.execute("SELECT total(hits),count(*) FROM counters")
-(views, visitors) = dbh.fetchone()
-print("Content-Type: text/plain\n")
-print(f"This page has been viewed {views} times")
-print(f"by {visitors} unique visitors!")
+def hit_counter(environ):
+    ip = environ['REMOTE_ADDR']
+    record_new_visit(dbh, ip)
+    summary = generate_summary_of_visits(dbh)
+
+    print("Content-Type: text/plain\n")
+    print(summary)
+
+# Init
+dbh = connect_to_db()
+hit_counter(os.environ)
