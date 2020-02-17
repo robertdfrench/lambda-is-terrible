@@ -23,3 +23,7 @@ in Lambda + DynamoDB and compare this approach to CGI + SQLite.
   * This makes you pay for way more than you need in order to get a responsive app
   * Speculation: this comes from oversubscribing RAM via KSM, can't do same with network
 * Lambda saves money when apps are mostly off, but the developer time will never pay off.
+
+### Acknowledgements
+* Abe Simpson image © 20th Century Fox
+* Critical Feedback from [@myoung34](https://github.com/myoung34)
