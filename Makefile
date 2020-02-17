@@ -5,7 +5,7 @@ slides.pdf: slides.tex
 	texi2pdf --batch --clean $<
 
 cgi_benchmark: clean
-	time ./wrap.sh 1024 > /dev/null
+	time ./cgi_benchmark_wrapper.sh 1024 > /dev/null
 
 clean:
 	rm -rf \
