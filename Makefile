@@ -4,8 +4,12 @@ view: slides.pdf
 slides.pdf: slides.tex
 	texi2pdf --batch --clean $<
 
+cgi_benchmark: clean
+	time ./wrap.sh 1024 > /dev/null
+
 clean:
 	rm -rf \
+		*.sqlite3 \
 		*.aux \
 		*.log \
 		*.nav \
@@ -14,4 +18,3 @@ clean:
 		*.toc \
 		*.pdf \
 		*.snm
-

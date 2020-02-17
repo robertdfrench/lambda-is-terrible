@@ -6,5 +6,5 @@ function random_ip() {
 
 num_requests=$1
 for i in $(seq 1 ${num_requests}); do
-	./cgi.py `random_ip`
+	REMOTE_ADDR=`random_ip` ./cgi.py
 done
