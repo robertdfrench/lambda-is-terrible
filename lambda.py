@@ -4,7 +4,14 @@ def connect_to_db():
     return boto3.client('dynamodb')
 
 def generate_summary_of_visits(dbh):
+    results = dbh.scan(
+        TableName='counters',
+        ProjectionExpression='hits'
+    )
     (visits, visitors) = (0,0)
+    for row in results:
+        visits += row['hits']
+        visitors += 1
     return f"This page has been viewed {visits} times by {visitors} unique visitors"
 
 def record_new_visit(dbh, ip):
@@ -20,9 +27,6 @@ def hit_counter(event, context):
     record_new_visit(dbh, ip)
     summary = generate_summary_of_visits(dbh)
 
-    status = '200 OK'
-    headers = [('Content-type', 'text/plain; charset=utf-8')]
-    start_response(status, headers)
-    return [summary.encode('utf-8')]
+    return {'message': summary}
 
 dbh = connect_to_db()
