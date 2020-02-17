@@ -34,8 +34,11 @@
 	\end{itemize}
 \end{frame}
 
+\section{Traditional Web Apps}
+\frame{\sectionpage}
+
 \begin{frame}
-	\frametitle{Traditional Web Apps}
+	\frametitle{\insertsection : Overview}
 	\begin{itemize}
 		\pause \item CGI - \texttt{fork() + exec()} for each request
 		\pause \item FastCGI - Single \texttt{fork() + exec()} w/o big rewrite
@@ -43,15 +46,64 @@
 	\end{itemize}
 	\pause For our purposes, we can treat FastCGI and HTTP Proxy as equivalent.
 \end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : CGI}
+	\begin{itemize}
+		\pause \item \texttt{exec()} one process per request
+		\pause \item new process runs as the \texttt{httpd} user
+			\begin{itemize}
+				\item Let's ignore \texttt{suexec} for now
+			\end{itemize}
+		\pause \item Access to secrets, etc through filesystem permissions
+		\pause \item No requests $\implies$ no load on server
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : FastCGI}
+	\begin{itemize}
+		\pause \item Goal: Minimize \texttt{fork() + exec()} w/o major rewrite
+		\pause \item Method of Choice for PHP, otherwise out of fashion
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : WSGI}
+	\begin{itemize}
+		\pause \item Guido re-invented FastCGI for some reason\ldots
+		\pause \item Requires a supporting webserver module
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : FastCGI / WSGI / Reverse Proxy}
+	\begin{itemize}
+		\pause \item Long-running application process handles many requests
+		\pause \item Application can run as its own user (separate from webserver)
+		\pause \item Can be managed by the host's init framework
+			\begin{itemize}
+				\item providing access to secrets, sockets at launch time
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : FastCGI / WSGI / Reverse Proxy}
+	\begin{itemize}
+		\pause \item Scripting languages, usually single-threaded
+		\pause \item Concurrency planning is on you (init framework can help)
+	\end{itemize}
+\end{frame}
  
 \section{Firecracker}
 \frame{\sectionpage}
 
 \begin{frame}
 	\frametitle{Cold Start}
-	``A single Firecracker microVM can be launched in 125 ms\ldots You'd be
+	``A single Firecracker microVM can be launched in \alert{125 ms}\ldots You'd be
 	hard-pressed to find something faster.''
-	- \href{https://www.techrepublic.com/article/aws-firecracker-10-things-every-tech-pro-should-know/}{Brandon Vigliarolo / Tech Republic}
+	- \href{https://www.techrepublic.com/article/aws-firecracker-10-things-every-tech-pro-should-know/}{Tech Republic}
 \end{frame}
 
 \begin{frame}
