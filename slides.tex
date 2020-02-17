@@ -33,6 +33,16 @@
 		\pause \item If you are willing to learn Serverless, why not UNIX?
 	\end{itemize}
 \end{frame}
+
+\begin{frame}
+	\frametitle{Traditional Web Apps}
+	\begin{itemize}
+		\pause \item CGI - \texttt{fork() + exec()} for each request
+		\pause \item FastCGI - Single \texttt{fork() + exec()} w/o big rewrite
+		\pause \item HTTP Proxy - Application is also a small web server
+	\end{itemize}
+	\pause For our purposes, we can treat FastCGI and HTTP Proxy as equivalent.
+\end{frame}
  
 \section{Firecracker}
 \frame{\sectionpage}
