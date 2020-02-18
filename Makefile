@@ -45,6 +45,9 @@ deploy_lambda: .terraform/init
 	terraform init
 	@touch $@
 
+destroy_lambda: .terraform/init
+	terraform destroy -auto-approve
+
 clean:
 	rm -rf \
 		*.sqlite3 \
