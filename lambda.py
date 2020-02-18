@@ -27,6 +27,11 @@ def hit_counter(event, context):
     record_new_visit(dbh, ip)
     summary = generate_summary_of_visits(dbh)
 
-    return {'message': summary}
+    return {
+        'headers': {'Content-Type': 'text/plain'},
+        'statusCode': 200,
+        'isBase64Encoded': False,
+        'body': summary
+    }
 
 dbh = connect_to_db()
