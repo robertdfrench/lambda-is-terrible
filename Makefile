@@ -20,7 +20,9 @@ ifndef REQUESTS
 	$(error "set $$REQUESTS=1024, to simulate 1024 requests")
 endif
 	@echo -n "Requests per second: "
-	@for i in `seq 1 $(CONCURRENCY)`; do ($(MAKE) cgi_benchmark REQUESTS=$(REQUESTS) &); done 2>&1 \
+	@for i in `seq 1 $(CONCURRENCY)`; do
+		($(MAKE) cgi_benchmark REQUESTS=$(REQUESTS) &);
+	done 2>&1 \
 		| awk '/real/ { print $$2 }' \
 		| sort -g \
 		| tail -n1 \
@@ -35,6 +37,13 @@ ifndef REQUESTS
 	$(error "set $$REQUESTS=1024, to simulate 1024 requests")
 endif
 	ab -c $(CONCURRENCY) -n $(REQUESTS) -m GET "http://127.0.0.1:8000/"
+
+deploy_lambda: .terraform/init
+	terraform apply -auto-approve
+
+.terraform/init:
+	terraform init
+	@touch $@
 
 clean:
 	rm -rf \

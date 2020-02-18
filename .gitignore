@@ -1,3 +1,4 @@
+# LaTeX
 *.aux
 *.log
 *.nav
@@ -6,5 +7,14 @@
 *.toc
 *.pdf
 *.snm
+
+# Demo apps
 *.sqlite3
+
+# Vim
 *.swp
+*.swo
+
+# Terraform
+.terraform/*
+*.tfstate
