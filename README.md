@@ -26,4 +26,5 @@ in Lambda + DynamoDB and compare this approach to CGI + SQLite.
 
 ### Acknowledgements
 * Abe Simpson image © 20th Century Fox
+* Modern Problems meme © Dave Chappelle / Comedy Central
 * Critical Feedback from [@myoung34](https://github.com/myoung34)

@@ -1,7 +1,6 @@
 \documentclass{beamer}
 \usepackage[utf8]{inputenc}
  
- 
 %% Title
 \title{AWS Lambda}
 \subtitle{What It Is and Why It's Terrible}
@@ -17,6 +16,10 @@
 	\includegraphics[scale=0.35]{cloud.jpg}
 \end{frame}
 
+%% What it is
+\section{What it is}
+\frame{\sectionpage}
+
 \begin{frame}
 	\frametitle{The Allegations}
 	The \emph{Serverless} ethos is a response to alleged shortcomings of traditional
@@ -25,17 +28,44 @@
 		\pause \item Patching servers is hard.
 		\pause \item Scaling servers is hard.
 		\pause \item Money spent on idle VMs is wasted.
+		\pause \item System Administration is a barrier between you and success.
 	\end{itemize}
 	\pause
 	We'll accept these claims for the moment, because they motivate Lambda's design.
 \end{frame}
 
 \begin{frame}
-	\frametitle{Some Skepticism}
+	\frametitle{The Sell}
 	\begin{itemize}
-		\item If your team is bad at these, will a new platform will be easier?
-		\pause \item If you are willing to learn Serverless, why not double down
-			on your existing platform?
+		\item No cost when not in use
+		\pause \item Amazon ``scales'' your app for you
+		\pause \item System Administration is pass\'e
+		\pause \item Traditional apps could never scale this high anyhow
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{The Sell}
+	\centering
+	\includegraphics[scale=0.2]{modern_problems.jpg}
+\end{frame}
+
+\begin{frame}
+	\frametitle{The Bait \& Switch}
+	\begin{itemize}
+		\item No local filesystem
+		\pause \item No persistent service connections (RDBMS, MQ, etc)
+		\pause \item No \texttt{syslog} or \texttt{snmp}
+		\pause \item No \texttt{bpftrace} or \texttt{atop}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{The Bait \& Switch}
+	\begin{itemize}
+		\item No \emph{official} VM or Container images for local development
+		\pause \item No announced changes to base images
+		\pause \item No official catalogue of what's \emph{included} in images
 	\end{itemize}
 \end{frame}
 
@@ -43,49 +73,57 @@
 \frame{\sectionpage}
 
 \begin{frame}
-	\frametitle{\insertsection : Overview}
+	\frametitle{Overview}
 	\begin{itemize}
-		\pause \item CGI - \texttt{fork() + exec()} for each request
+		\item CGI - \texttt{fork() + exec()} for each request
 		\pause \item FastCGI - Single \texttt{fork() + exec()} w/o big rewrite
 		\pause \item HTTP Proxy - Application is also a small web server
 	\end{itemize}
-	\pause For our purposes, we can treat FastCGI and HTTP Proxy as equivalent.
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : CGI}
+	\frametitle{CGI}
 	\begin{itemize}
-		\pause \item \texttt{exec()} one process per request
+		\item \texttt{exec()} one process per request
 		\pause \item new process runs as the \texttt{httpd} user
 			\begin{itemize}
 				\item Let's ignore \texttt{suexec} for now
 			\end{itemize}
 		\pause \item Access to secrets, etc through filesystem permissions
-		\pause \item No requests $\implies$ no load on server
+		\pause \item No requests $\implies$ no load on server \emph{due to web requests}
 		\pause \item Rapid connect + query + disconnect is hard on RDBMS
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : FastCGI}
+	\frametitle{Sidebar: Is \texttt{fork()} expensive?}
 	\begin{itemize}
-		\pause \item Goal: Minimize \texttt{fork() + exec()} w/o major rewrite
+		\pause \item Used to be, sortof.
+		\pause \item Copy on Write!
+		\pause \item \texttt{exec()} $\implies$ write, so expense still exists, but deferred
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{FastCGI}
+	\begin{itemize}
+		\item Goal: Minimize \texttt{fork() + exec()} w/o major rewrite
 		\pause \item Method of Choice for PHP, otherwise out of fashion
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : WSGI}
+	\frametitle{WSGI}
 	\begin{itemize}
-		\pause \item Guido re-invented FastCGI for some reason\ldots
+		\item Guido re-invented FastCGI for some reason\ldots
 		\pause \item Requires a supporting webserver module
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : FastCGI / WSGI / Reverse Proxy}
+	\frametitle{FastCGI / WSGI / Reverse Proxy}
 	\begin{itemize}
-		\pause \item Long-running application process handles many requests
+		\item Long-running application process handles many requests
 		\pause \item Application can run as its own user (separate from webserver)
 		\pause \item Can be managed by the host's init framework
 			\begin{itemize}
@@ -95,9 +133,9 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : FastCGI / WSGI / Reverse Proxy}
+	\frametitle{FastCGI / WSGI / Reverse Proxy}
 	\begin{itemize}
-		\pause \item Scripting languages, usually single-threaded
+		\item Scripting languages, usually single-threaded
 		\pause \item Concurrency planning is on you (init framework can help)
 		\pause \item This is the type of client Relational Databases like
 	\end{itemize}
@@ -107,9 +145,9 @@
 \frame{\sectionpage}
 
 \begin{frame}
-	\frametitle{\insertsection : IAM Roles}
+	\frametitle{IAM Roles}
 	\begin{itemize}
-		\pause \item One role to deploy the lambda (Jenkins)
+		\item One role to deploy the lambda (Jenkins)
 			\begin{itemize}
 				\item What does Jenkins need to create / change?
 			\end{itemize}
@@ -122,9 +160,22 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : Under the Hood}
+	\frametitle{Web Integration}
 	\begin{itemize}
-		\pause \item Pre-2018, implementation details were scarce
+		\item AWS API Gateway is Apache VirtualHost Galaxy Brain
+		\pause \item For each route\ldots
+			\begin{itemize}
+				\pause \item Method (GET, POST, etc)
+				\pause \item Resource (path name)
+				\pause \item Transformation logic (\texttt{mod rewrite})
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Under the Hood}
+	\begin{itemize}
+		\item Pre-2018, implementation details were scarce
 		\pause \item Quick booting rules out virtualization
 		\pause \item Zip files + Defined entry points\ldots maybe a container?
 		\pause \item \ldots did Amazon make User Namespaces trustworthy?
@@ -135,27 +186,28 @@
 \frame{\sectionpage}
 
 \begin{frame}
-	\frametitle{\insertsection : Overview}
+	\frametitle{Overview}
 	\begin{itemize}
-		\pause \item Not containers!
+		\item Not containers!
 		\pause \item Tiny VMs, designed for rapid booting
 		\pause \item Still holding out hope for User Namespaces\ldots
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsection : Cold Start}
+	\frametitle{Cold Start}
 	``A single Firecracker microVM can be launched in \alert{125 ms}\ldots You'd be
 	hard-pressed to find something faster.''
 	- \href{https://www.techrepublic.com/article/aws-firecracker-10-things-every-tech-pro-should-know/}{Tech Republic}
 \end{frame}
 
- 
-\section{Criticism}
-\frame{\sectionpage}
-
 \begin{frame}
-	Include rebuttle from @myoung34 here
+	\frametitle{Some Skepticism}
+	\begin{itemize}
+		\item If your team is bad at these, will a new platform will be easier?
+		\pause \item If you are willing to learn Serverless, why not double down
+			on your existing platform?
+	\end{itemize}
 \end{frame}
 
 \end{document}
