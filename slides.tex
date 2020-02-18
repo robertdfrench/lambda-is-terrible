@@ -100,22 +100,54 @@
 		\pause \item Concurrency planning is on you (init framework can help)
 	\end{itemize}
 \end{frame}
+
+\section{Lambda}
+\frame{\sectionpage}
+
+\begin{frame}
+	\frametitle{\insertsection : IAM Roles}
+	\begin{itemize}
+		\pause \item One role to deploy the lambda (Jenkins)
+			\begin{itemize}
+				\item What does Jenkins need to create / change?
+			\end{itemize}
+		\pause \item One role for \alert{AWS to Assume} when running your lambda
+			\begin{itemize}
+				\item What does \emph{this lambda} need to touch?
+			\end{itemize}
+		\pause \item Tradeoff: keeping roles minimal vs. minimizing \# of roles
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : Under the Hood}
+	\begin{itemize}
+		\pause \item Pre-2018, implementation details were scarce
+		\pause \item Quick booting rules out virtualization
+		\pause \item Zip files + Defined entry points\ldots maybe a container?
+		\pause \item \ldots did Amazon make User Namespaces trustworthy?
+	\end{itemize}
+\end{frame}
  
 \section{Firecracker}
 \frame{\sectionpage}
 
 \begin{frame}
-	\frametitle{Cold Start}
+	\frametitle{\insertsection : Overview}
+	\begin{itemize}
+		\pause \item Not containers!
+		\pause \item Tiny VMs, designed for rapid booting
+		\pause \item Still holding out hope for User Namespaces\ldots
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsection : Cold Start}
 	``A single Firecracker microVM can be launched in \alert{125 ms}\ldots You'd be
 	hard-pressed to find something faster.''
 	- \href{https://www.techrepublic.com/article/aws-firecracker-10-things-every-tech-pro-should-know/}{Tech Republic}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Firecracker}
-	You can't imagine how disappointed I was to find out that they \emph{didn't} fix
-	User Namespaces.
-\end{frame}
  
 \section{Criticism}
 \frame{\sectionpage}
