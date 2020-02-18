@@ -38,8 +38,12 @@ ifndef REQUESTS
 endif
 	ab -c $(CONCURRENCY) -n $(REQUESTS) -m GET "http://127.0.0.1:8000/"
 
-deploy_lambda: .terraform/init
+deploy_lambda: .terraform/init lambda.zip
 	terraform apply -auto-approve
+
+lambda.zip: lambda.py
+	rm -f $@
+	zip $@ $^
 
 .terraform/init:
 	terraform init
@@ -50,6 +54,7 @@ destroy_lambda: .terraform/init
 
 clean:
 	rm -rf \
+		*.zip \
 		*.sqlite3 \
 		*.aux \
 		*.log \

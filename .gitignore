@@ -8,8 +8,9 @@
 *.pdf
 *.snm
 
-# Demo apps
+# Application
 *.sqlite3
+*.zip
 
 # Vim
 *.swp

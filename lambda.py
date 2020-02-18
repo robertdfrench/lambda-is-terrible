@@ -9,8 +9,8 @@ def generate_summary_of_visits(dbh):
         ProjectionExpression='hits'
     )
     (visits, visitors) = (0,0)
-    for row in results:
-        visits += row['hits']
+    for item in results['Items']:
+        visits += int(item['hits']['N'])
         visitors += 1
     return f"This page has been viewed {visits} times by {visitors} unique visitors"
 
